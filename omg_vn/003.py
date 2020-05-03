@@ -20,5 +20,4 @@ df.loc[df['Rev'].between(80000000,89999999), 'Ranking'] = 'Vip8'
 df.loc[df['Rev'].between(90000000,99999999), 'Ranking'] = 'Vip9'
 df.loc[df['Rev']>=100000000, 'Ranking'] = 'Vip10'
 print(df.sort_values(by = ['Rev'], ascending = [True]))
-
 conn.close()
