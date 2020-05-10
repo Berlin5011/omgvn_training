@@ -16,3 +16,5 @@ def date_trunc(val, part):
         return val - datetime.timedelta(days = date_part(val,'dow'))
     elif part == 'month':
         return val - datetime.timedelta(days = date_part(val, 'day')-1)
+    elif part == 'day':
+        return val.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
