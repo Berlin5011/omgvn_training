@@ -4,7 +4,7 @@ import pandas as pd
 from credential import usrnm, pwd, host, db
 from datetime import timedelta
 import time
-
+#------------------------------------------------------------------
 start = time.time()
 engine = create_engine('postgresql://'+usrnm('vn')+':'+pwd('vn')+'@'+host()+':5432/'+db('vn'))
 conn = engine.connect()
@@ -15,16 +15,13 @@ command_u = """select 	dbg_add."userID",
                 from dbg_add
                 inner join user_profile on dbg_add."userID" = user_profile."userID"
                 group by 1,2,3 """
-dfu = pd.DataFrame(engine.execute(command_u), columns = ['userID', '1stLogin','chargeDate','gr'])
+dfu = pd.DataFrame(engine.execute(command_u), columns = ['userID', '1stLogin','chargeDate','gr']).sort_values(by = ['1stLogin', 'chargeDate'], ascending = [True, True])
 conn.close()
 end = time.time()
 print("Data query cost = "+str(end-start)+'s')
-ans = pd.DataFrame(dfu["1stLogin"].unique(), columns = ["1stLogin"]).sort_values(by = "1stLogin", ascending = [True])
-x = ["GR00", "GR01", "GR03", "GR07", "GR14", "GR21", "GR30"]
-for i in x:
-    diff = dfu[dfu["chargeDate"] - dfu["1stLogin"] <= timedelta(days = int(i[2:4]))].groupby(by = "1stLogin")["gr"].sum().reset_index()
-    diff.columns = ['userID', i]
-    ans = ans.join(diff.set_index('userID'), on = "1stLogin")
-print(ans)
+dfu['sub'] = dfu['chargeDate'] - dfu['1stLogin']
+nru = dfu.groupby(by = ['1stLogin'])['userID'].count()
+ans = dfu.groupby(by = ['1stLogin', 'sub'])['gr'].sum().reset_index()
+print(ans[ans['sub']<= timedelta(days = 30)].groupby(by = ['1stLogin']).sum())
 end2 = time.time()
-print("Data processing cost = "+ str(end2-end)+'s')
+print(end2 - end)
