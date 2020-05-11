@@ -26,11 +26,13 @@ end = time.time()
 print("Data query cost = "+str(end-start)+'s')
 #--------------------------------------------------------------------
 x = ["LTV00", "LTV01", "LTV03", "LTV07", "LTV14", "LTV21", "LTV30"]
+
 for i in x:
     diff = dfu[dfu["chargeDate"] - dfu["1stLogin"] <= timedelta(days = int(i[3:5]))].groupby(by = "1stLogin")["gr"].sum().reset_index()
     diff.columns = ['1stLogin',i]
     ans = ans.join(diff.set_index('1stLogin'), on = "1stLogin")
     ans[i] = ans[i]/ans['NRU']
+
 print(ans)
 end2 = time.time()
 print("Data processing cost = "+ str(end2-end)+'s')
