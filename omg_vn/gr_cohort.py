@@ -11,13 +11,13 @@ conn = engine.connect()
 command_u = """select 	dbg_add."userID",
 		        date_trunc('day', user_profile."firstLoginDate"),
                         dbg_add."chargeDate",
-                        sum(dbg_add."grossRev")*752 as "gr"
+                        sum(dbg_add."grossRev") as "gr"
                 from dbg_add
                 inner join user_profile on dbg_add."userID" = user_profile."userID"
                 group by 1,2,3 """
 dfu = pd.DataFrame(engine.execute(command_u), columns = ['userID', '1stLogin','chargeDate','gr']).sort_values(by = ['1stLogin', 'chargeDate'], ascending = [True, True])
-command_nru = """select 	count(*) as "NRU",
-                            date_trunc('day', "firstLoginDate") as "1stLogin"
+command_nru = """select count(*) as "NRU",
+                        date_trunc('day', "firstLoginDate") as "1stLogin"
                 from user_profile
                 group by 2"""
 nru = pd.DataFrame(engine.execute(command_nru), columns = ['NRU', '1stLogin']).sort_values(by = ['1stLogin'], ascending = [True])
